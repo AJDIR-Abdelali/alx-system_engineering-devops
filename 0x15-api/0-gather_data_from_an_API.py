@@ -1,30 +1,21 @@
 #!/usr/bin/python3
-'''
-gather employee data from API
-'''
-
-import re
+"""import api from a url"""
 import requests
 import sys
 
-REST_API = "https://jsonplaceholder.typicode.com"
-
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        if re.fullmatch(r'\d+', sys.argv[1]):
-            id = int(sys.argv[1])
-            req = requests.get('{}/users/{}'.format(REST_API, id)).json()
-            task_req = requests.get('{}/todos'.format(REST_API)).json()
-            emp_name = req.get('name')
-            tasks = list(filter(lambda x: x.get('userId') == id, task_req))
-            completed_tasks = list(filter(lambda x: x.get('completed'), tasks))
-            print(
-                'Employee {} is done with tasks({}/{}):'.format(
-                    emp_name,
-                    len(completed_tasks),
-                    len(tasks)
-                )
-            )
-            if len(completed_tasks) > 0:
-                for task in completed_tasks:
-                    print('\t {}'.format(task.get('title')))
+if __name__ == "__main__":
+    try:
+        id = int(sys.argv[1])
+        url = "https://jsonplaceholder.typicode.com"
+        res = requests.get('{}/users/{}'.format(url, id)).json()
+        res_todo = requests.get("{}/todos".format(url),
+                                params={"userId": id}).json()
+        task_comp = [t.get('title') for t in res_todo
+                     if t.get("completed") is True]
+        b = "Employee {} is done with tasks({}/{}):".format(
+            res.get('name'), len(task_comp), len(res_todo))
+        print(b)
+        for t in task_comp:
+            print("\t {}".format(t))
+    except ValueError:
+        pass

@@ -1,24 +1,22 @@
 #!/usr/bin/python3
-""" Export api to csv"""
-import csv
+"""import api from a url"""
 import requests
 import sys
 
-if __name__ == '__main__':
-    user = sys.argv[1]
-    url_user = 'https://jsonplaceholder.typicode.com/users/' + user
-    res = requests.get(url_user)
-    """ANYTHING"""
-    user_name = res.json().get('username')
-    task = url_user + '/todos'
-    res = requests.get(task)
-    tasks = res.json()
-
-    with open('{}.csv'.format(user), 'w') as csvfile:
-        for task in tasks:
-            completed = task.get('completed')
-            """Complete"""
-            title_task = task.get('title')
-            """Done"""
-            csvfile.write('"{}","{}","{}","{}"\n'.format(
-                user, user_name, completed, title_task))
+if __name__ == "__main__":
+    try:
+        id = int(sys.argv[1])
+        url = "https://jsonplaceholder.typicode.com"
+        res = requests.get('{}/users/{}'.format(url, id)).json()
+        res_todo = requests.get("{}/todos".format(url),
+                                params={"userId": id}).json()
+        name = res.get("username")
+        with open('{}.csv'.format(id), 'w') as apidata:
+            for todo in res_todo:
+                apidata.write(
+                    '"{}","{}","{}","{}"\n'.format(id, name,
+                                                   todo.get('completed'),
+                                                   todo.get('title'))
+                )
+    except ValueError:
+        pass
